@@ -42,29 +42,29 @@
 #define EV_WRITE	EVLIST_WRITE
 
 struct event {
-	TAILQ_ENTRY (event) ev_read_next;
-	TAILQ_ENTRY (event) ev_write_next;
-	TAILQ_ENTRY (event) ev_timeout_next;
-	TAILQ_ENTRY (event) ev_add_next;
+  TAILQ_ENTRY (event) ev_read_next;
+  TAILQ_ENTRY (event) ev_write_next;
+  TAILQ_ENTRY (event) ev_timeout_next;
+  TAILQ_ENTRY (event) ev_add_next;
 
-	int ev_fd;
-	short ev_events;
+  int ev_fd; // 要监听的事件描述符
+  short ev_events; // 要监听什么事件
 
-	struct timeval ev_timeout;
+  struct timeval ev_timeout; // 超时时间
 
-	void (*ev_callback)(int, short, void *arg);
-	void *ev_arg;
+  void (*ev_callback)(int, short, void *arg); // 事件处理函数
+  void *ev_arg; // 事件处理函数的参数
 
-	int ev_flags;
+  int ev_flags; // 标志位，用来指示事件是否在某个队列中
 };
 
 #define TIMEOUT_DEFAULT	5
 
-void event_init(void);
-int event_dispatch(void);
+void event_init(void); // 初始化，实际上就初始化了几个队列
+int event_dispatch(void); // 事件派遣函数
 
-int timeout_next(struct timeval *);
-void timeout_process(void);
+int timeout_next(struct timeval *); // 计算超时时间
+void timeout_process(void); // 处理超时队列中过期的事件
 
 #define timeout_add(ev, tv)		event_add(ev, tv)
 #define timeout_set(ev, cb, arg)	event_set(ev, -1, 0, cb, arg)
@@ -72,9 +72,9 @@ void timeout_process(void);
 #define timeout_pending(ev, tv)		event_pending(ev, EV_TIMEOUT, tv)
 #define timeout_initalized(ev)		((ev)->ev_flags & EVLIST_INIT)
 
-void event_set(struct event *, int, short, void (*)(int, short, void *), void *);
-void event_add(struct event *, struct timeval *);
-void event_del(struct event *);
+void event_set(struct event *, int, short, void (*)(int, short, void *), void *); // 初始化事件对象
+void event_add(struct event *, struct timeval *); // 将事件添加到对应的队列中
+void event_del(struct event *); // 将事件从所有队列移除
 
 int event_pending(struct event *, short, struct timeval *);
 
